@@ -72,6 +72,12 @@ io.sockets.on('connection',
       io.sockets.emit('draw', data);
     });
 
+    socket.on('answer', function(data) {
+      console.log("got answer");
+
+      io.sockets.emit('answer', data);
+    });
+
 
     socket.on('disconnect', function() {
       console.log("Client has disconnected");

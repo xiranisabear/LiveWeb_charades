@@ -3,8 +3,8 @@
 <head>
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript">
-
-var choosen = false;
+		var choosen = false;
+		var words = ["pig", "bear", "monkey"];
 
 		window.addEventListener('load', function() {
 			let canvas = document.getElementById('thecanvas');
@@ -15,30 +15,45 @@ var choosen = false;
 
 
 			canvas.addEventListener('mousemove', function(evt) {
-if (choosen) {
-				var rect = canvas.getBoundingClientRect();
+				if (choosen) {
 
-				let x = evt.clientX - rect.left;
-				let y = evt.clientY - rect.top;
+					var rect = canvas.getBoundingClientRect();
+
+					let x = evt.clientX - rect.left;
+					let y = evt.clientY - rect.top;
 
 
-				var thedata = {x: evt.clientX - rect.left,y: evt.clientY - rect.top};
-				console.log(thedata);
-				socket.emit('draw', thedata);
-        console.log(thedata);
+					var thedata = {
+						x: evt.clientX - rect.left,
+						y: evt.clientY - rect.top
+					};
+					console.log(thedata);
+					socket.emit('draw', thedata);
+					console.log(thedata);
 
-				if (px != -1) {
-					context.beginPath();
-					context.moveTo(px, py);
-					context.lineTo(x,y);
-					context.stroke();
+					if (px != -1) {
+						context.beginPath();
+						context.moveTo(px, py);
+						context.lineTo(x, y);
+						context.stroke();
+					}
+
+					px = x;
+					py = y;
 				}
-
-				px = x;
-				py = y;
-}
 			});
 
+			var button = document.getElementById('button');
+
+			button.onclick = function() {
+				var answer = document.getElementById('answers').value;
+				// var node = document.createElement("LI");
+				// var textnode = document.createTextNode(answer);
+				// node.appendChild(textnode);
+				// document.getElementById("myList").appendChild(node);
+				console.log("send answer");
+				socket.emit('answer', answer);
+			}
 		});
 
 
@@ -69,19 +84,34 @@ if (choosen) {
 			console.log(data);
 		});
 
-		socket.on('painter', function(data) {
+		socket.on('answer', function(data) {
+			console.log("I received the answer"+data);
 
-			if (data == "you"){
+			var node = document.createElement("LI");
+			var textnode = document.createTextNode(data);
+			node.appendChild(textnode);
+			document.getElementById("myList").appendChild(node);
+		});
+
+		socket.on('painter', function(data) {
+			var wordIndex = Math.floor(Math.random() * 3);
+
+			document.getElementById("itemstodraw").innerHTML = "You are supposed to draw a " + words[wordIndex];
+
+			if (data == "you") {
+				//
+
 				choosen = true;
 			}
 			// console.log("the chosen one: " + data.x);
 			// console.log("Your ID is: " + data.y);
-      //
+			//
 			// if(data.x == data.y){
 			// 	console.log("you are chosen!");
 			// 	//then make the chosen one the "moderator"
 			// 	choosen = true;
 			// }
+
 
 		});
 
@@ -89,13 +119,18 @@ if (choosen) {
 		socket.on('connect', function() {
 			console.log("Connected");
 		});
-
-
 	</script>
 </head>
 
 <body>
+	<div id="itemstodraw">
+	</div>
 	<canvas width="400" height="400" id="thecanvas">hi</canvas>
+	<input type="text" id="answers" value="type the answer">
+	<button id="button">Submit</button>
+	<!-- <div id="display"> </div> -->
+	<div id="myList"> </div>
+
 	<!-- <canvas width="400" height="400" id="thecanvas2">hi</canvas> -->
 
 </body>
