@@ -45,16 +45,20 @@ io.sockets.on('connection',
     console.log("We have a new client: " + socket.id);
 
 
-    users.push(socket.id);
+    users.push(socket);
+    // console.log(users);
 
-    for(let i = 0; i<maxNumUsers;i++){
-
-      socket.emit('socketid', users[i]);
-    };
+    // for(let i = 0; i<maxNumUsers;i++){
+    //
+    //   socket.emit('socketid', users[i]);
+    // };
 
     if(users.length>=maxNumUsers){
-      var ids = {x:users[1],y:socket.id};
-      socket.emit('painter', ids);
+      // var ids = {x:users[0].id,y:xxxxxx};
+
+      // console.log("Choosen: " + ids.x);
+      //io.sockets.emit('painter', ids);
+      users[0].emit('painter', "you");
     };
 
     // When this user "send" from clientside javascript, we get a "message"
@@ -72,6 +76,12 @@ io.sockets.on('connection',
     socket.on('disconnect', function() {
       console.log("Client has disconnected");
       numUsers--;
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].id == socket.id) {
+          users.splice(i,1);
+          // console.log(users);
+        }
+      }
     });
     // } else {
     //   socket.disconnect();
