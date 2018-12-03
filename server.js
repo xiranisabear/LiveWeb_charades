@@ -27,7 +27,7 @@ function requestHandler(req, res) {
 }
 
 var numUsers = 0;
-var maxNumUsers = 8;
+var maxNumUsers = 2;
 var users = [];
 
 // WebSocket Portion
@@ -46,17 +46,27 @@ io.sockets.on('connection',
 
 
     users.push(socket.id);
+
     for(let i = 0; i<maxNumUsers;i++){
+
       socket.emit('socketid', users[i]);
-    }
+    };
+
+    if(users.length>=maxNumUsers){
+      var ids = {x:users[1],y:socket.id};
+      socket.emit('painter', ids);
+    };
 
     // When this user "send" from clientside javascript, we get a "message"
     // client side: socket.send("the message");  or socket.emit('message', "the message");
 
-
-
-
-
+    //
+    //
+    socket.on('draw', function(data) {
+      console.log("got data");
+      // console.log(data);
+      io.sockets.emit('draw', data);
+    });
 
 
     socket.on('disconnect', function() {
