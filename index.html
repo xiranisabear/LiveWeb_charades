@@ -4,6 +4,7 @@
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript">
 		var choosen = false;
+		var displayKeyword = false;
 		var words = ["pig", "bear", "monkey"];
 
 		window.addEventListener('load', function() {
@@ -13,6 +14,21 @@
 			let px = -1;
 			let py = -1;
 
+			//button that start the page
+			// var start = document.getElementById('start');
+
+			// start.onclick = function() {
+			// 	start.style.display="none";
+			// 	if (!choosen) {
+			// 		button.style.display = "block";
+			// 		input.style.display = "block";
+      //
+      //
+      //
+			// 	}else{
+      //
+			// 	}
+			// }
 
 			canvas.addEventListener('mousemove', function(evt) {
 				if (choosen) {
@@ -40,20 +56,24 @@
 
 					px = x;
 					py = y;
+				}else if(choosen=false){
+						document.getElementById('itemstodraw').innerHTML="You are supposed to guess what the painter is drawing";
+
 				}
 			});
 
+			//button and input to tell the answer
 			var button = document.getElementById('button');
+			var input = document.getElementById('answers');
+
 
 			button.onclick = function() {
 				var answer = document.getElementById('answers').value;
-				// var node = document.createElement("LI");
-				// var textnode = document.createTextNode(answer);
-				// node.appendChild(textnode);
-				// document.getElementById("myList").appendChild(node);
 				console.log("send answer");
 				socket.emit('answer', answer);
 			}
+
+
 		});
 
 
@@ -85,7 +105,7 @@
 		});
 
 		socket.on('answer', function(data) {
-			console.log("I received the answer"+data);
+			console.log("I received the answer" + data);
 
 			var node = document.createElement("LI");
 			var textnode = document.createTextNode(data);
@@ -94,14 +114,23 @@
 		});
 
 		socket.on('painter', function(data) {
-			var wordIndex = Math.floor(Math.random() * 3);
 
-			document.getElementById("itemstodraw").innerHTML = "You are supposed to draw a " + words[wordIndex];
-
+			let canvas = document.getElementById('thecanvas');
+			let context = canvas.getContext('2d');
 			if (data == "you") {
 				//
 
 				choosen = true;
+				var wordIndex = Math.floor(Math.random() * 3);
+
+				document.getElementById("itemstodraw").innerHTML = "You are choosen as a painter! You are supposed to draw a " + words[wordIndex];
+				document.getElementById('answers').style.display="none";
+				document.getElementById('button').style.display="none";
+
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+			}else{
+
 			}
 			// console.log("the chosen one: " + data.x);
 			// console.log("Your ID is: " + data.y);
@@ -126,10 +155,12 @@
 	<div id="itemstodraw">
 	</div>
 	<canvas width="400" height="400" id="thecanvas">hi</canvas>
-	<input type="text" id="answers" value="type the answer">
+	<input type="text" id="answers" value="Guess the object!" width=200></input>
 	<button id="button">Submit</button>
-	<!-- <div id="display"> </div> -->
+	<!-- <button id="start">Start the Game!</button> -->
+	<div id="display"> </div>
 	<div id="myList"> </div>
+
 
 	<!-- <canvas width="400" height="400" id="thecanvas2">hi</canvas> -->
 
